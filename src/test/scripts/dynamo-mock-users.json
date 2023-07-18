@@ -1,0 +1,106 @@
+{
+    "tsuke-users": [
+        {
+            "PutRequest": {
+                "Item": {
+                    "PK": {"S": "US#1a"},
+                    "SK": {"S": "US#1a"},
+                    "username": {"S": "Adrian"},
+                    "policy": {"S": "{'studio': 'guid1', 'capabilities': ['admin']}"},
+                    "status": {"S": "Enabled"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "PK": {"S": "US#2a"},
+                    "SK": {"S": "US#2a"},
+                    "username": {"S": "Timmy"},
+                    "policy": {"S": "{'studio': 'guid1', 'capabilities': ['admin']}"},
+                    "status": {"S": "Enabled"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "PK": {"S": "US#3a"},
+                    "SK": {"S": "US#3a"},
+                    "username": {"S": "Sarah"},
+                    "policy": {"S": "{'studio': 'guid1', 'capabilities': ['admin']}"},
+                    "status": {"S": "Disabled"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "PK": {"S": "US#1a"},
+                    "SK": {"S": "RT#eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJVUy0xIiwidXNlcm5hbWUiOiJBZHJpYW4iLCJwb2xpY3kiOnsic3R1ZGlvIjoiU1QtMSIsImNhcGFiaWxpdGllcyI6WyJhZG1pbiJdfSwic3RhdHVzIjoiRW5hYmxlZCIsImV4cCI6IjIwMjUtMDgtMDRUMTI6MDc6MzguNzUzWiJ9.-oKioH_5TFPZ7iQblAHj1jk9IPT09-mKJJHaAH02mcc"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "PK": {"S": "US#2a"},
+                    "SK": {"S": "RT#eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJVUy0yIiwidXNlcm5hbWUiOiJUaW1teSIsInBvbGljeSI6eyJzdHVkaW8iOiJTVC0xIiwiY2FwYWJpbGl0aWVzIjpbImFkbWluIl19LCJzdGF0dXMiOiJFbmFibGVkIiwiZXhwIjoiMjAyMS0wOC0wNFQxMjowNzozOC43NTNaIn0.VEvFkTw1RDlKEXmtAQFbVX3C2CCjjvnUgy6_qF69YaY"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "PK": {"S": "US#3a"},
+                    "SK": {"S": "RT#eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJVUy0yIiwidXNlcm5hbWUiOiJUaW1teSIsInBvbGljeSI6eyJzdHVkaW8iOiJTVC0xIiwiY2FwYWJpbGl0aWVzIjpbImFkbWluIl19LCJzdGF0dXMiOiJEaXNhYmxlZCIsImV4cCI6IjIwMjEtMDgtMDRUMTI6MDc6MzguNzUzWiJ9.B28FS6Jh4rujn68ZTIxTduBz1fzvnOsRNb0jMrjj9QY"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "PK": {"S": "US#1a"},
+                    "SK": {"S": "FA#ST#KaratakosJP#1983"},
+                    "token": {"S": "12345"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "PK": {"S": "US#2a"},
+                    "SK": {"S": "FA#ST#LittleTimmy#1987"},
+                    "token": {"S": "12345"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "PK": {"S": "US#3a"},
+                    "SK": {"S": "FA#ST#xDestinyStarzx#1986"},
+                    "token": {"S": "12345"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "PK": {"S": "ST#1"},
+                    "SK": {"S": "ST#1"},
+                    "name": {"S": "Jellyfish Studios"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "PK": {"S": "ST#2"},
+                    "SK": {"S": "ST#2"},
+                    "name": {"S": "Studio X"}
+                }
+            }
+        }
+    ]
+}
