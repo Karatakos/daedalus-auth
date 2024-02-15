@@ -1,22 +1,21 @@
-import {Query} from '../query.js';
-import {RefreshToken, UserAccountStatus} from '../../entities/user.js';
-import {UserRepo} from '../../repository/user.repo.js';
-import {Jwt} from '../jwt.js';
-import {SecretsManager} from '../secrets-manager.js';
+import { IQuery, IQueryHandler } from './query.js';
+import { RefreshToken, UserAccountStatus } from '../../entities/user.js';
+import { UserRepo } from '../../repository/user/user.repo.js';
+import { User } from '../../entities/user.js';
+import { Jwt } from '../../util/jwt.js';
+import { SecretsManager } from '../../util/secrets-manager.js';
 
-class RefreshTokenQuery extends Query {
-    #repo;
+class AccessTokenQuery implements IQuery {
+    constructor(public readonly refreshToken: string) {}
+}
 
-    constructor(repo) {
-        super();
-        
-        this.#repo = repo;
-    }
+class AccessTokenHandler implements IQueryHandler<string> {
+    constructor(private readonly repo: UserRepo ) {}
 
-    async execute(refreshToken) {
+    async execute(query: AccessTokenQuery): Promise<string> {
         // Check if a user account already exists
         // 
-        let user = await this.#repo.getUserForRefreshToken(refreshToken);
+        const user = await this.repo.getUserForRefreshToken(query.refreshToken);
 
         if (!user)
             throw new Error("Unauthorized. Refresh token not found, please sign-in again.");
@@ -29,14 +28,14 @@ class RefreshTokenQuery extends Query {
         // Yes we could instead store expiry in the DB with the token
         // but then we would not need a JWT -- that works fine too.
         // 
-        const refreshTokenPayload = Jwt.verify(SecretsManager.refreshTokenSecret, refreshToken);
+        const refreshTokenPayload = Jwt.verify(SecretsManager.refreshTokenSecret, query.refreshToken);
         const timestamp = new Date(refreshTokenPayload.exp);
         if (timestamp.getTime() < new Date().getTime())
             throw new Error("Unauthorized. Refresh token expired.");
     
         // Finally, generate new access token
         //
-        user.accessToken = Jwt.sign(
+        const token = Jwt.sign(
             SecretsManager.accessTokenSecret,
             {
                 userId: user.userAccount.userId, 
@@ -44,8 +43,8 @@ class RefreshTokenQuery extends Query {
                 exp: SecretsManager.createExpiry(SecretsManager.accessTokenTTLHours)
             });
 
-        return user.accessToken;
+        return token;
     }
 }
 
-export {RefreshTokenQuery};
+export { AccessTokenQuery, AccessTokenHandler };

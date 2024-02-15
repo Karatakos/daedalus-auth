@@ -1,0 +1,9 @@
+{
+  "mochaExplorer.nodeArgv": [
+      "--loader=ts-node/esm",
+      "--no-warnings=ExperimentalWarning",
+      "--experimental-specifier-resolution=node"
+    ],
+    
+  "cmake.configureOnOpen": false,
+}

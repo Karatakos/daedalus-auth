@@ -1,36 +1,38 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import http from 'http';
-import { Jwt } from '../actions/jwt.js';
-import { SecretsManager } from '../actions/secrets-manager.js';
+import { Jwt } from '../util/jwt.js';
+import { SecretsManager } from '../util/secrets-manager.js';
 
 import AuthRouter from './routes/auth.route.js';
 import { parseCookies } from './util/cookie-parser.js';
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const server = http.createServer(app);
 
 //  Unused for now but leaving it in place for the invevitable expansion of 
 //  responsibilities for this microservice, e.g. user admin, GDPR, etc.
 //
-let authenticator = (req, res, next) => {
+const authenticator = (req: Request, res: Response, next: NextFunction) => {
     try {
-        req.user = authenticate(req);
-        console.log(`[REST] Successfully authenticated user ${req.user.userId}`);
+        req.account = authenticate(req);
+        console.log(`[REST] Successfully authenticated user ${req.account.userId}`);
 
         next() ;
     }
-    catch (err) {
-        console.log("Exception occured authorizing a user: " + err.Message);
-        res.status(401).send({Status: "Unauthorized", Message: err.Message});
+    catch (e) {
+        const error = e as Error;
+
+        console.log("Exception occured authorizing a user: " + error.message);
+        res.status(401).send({Status: "Unauthorized", Message: error.message});
     }
 };
 
-let authenticate = (req) => {
+const authenticate = (req: Request): Account => {
     if (req.headers.cookie) {
-        let cookies = parseCookies(req.headers.cookie);
+        const cookies = parseCookies(req.headers.cookie);
 
         if (cookies && cookies?.accessToken) {
             const payload = Jwt.verify(SecretsManager.accessTokenSecret, cookies.accessToken);
@@ -54,7 +56,7 @@ app.use(helmet());
 app.use(express.urlencoded({extended: true}));
 app.use(express.json())
 
-app.get('/status', (req, res) => {
+app.get('/status', (req: Request, res: Response) => {
     res.send("OK");
 });
 

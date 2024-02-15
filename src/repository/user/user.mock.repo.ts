@@ -1,53 +1,50 @@
 import {UserRepo} from './user.repo.js';
-import {FederatedAccount, RefreshToken, UserAccount, User, UserAccountStatus} from '../entities/user.js';
+import {
+    FederatedAccount, 
+    RefreshToken, 
+    UserAccount, 
+    User,
+    FederatedAccountType} from '../../entities/user.js';
 
-class MockedUserRepo extends UserRepo {
-    #users = [];
+class MockedUserRepo implements UserRepo {
+    #datastore: any[];
     
-    constructor(mockedUsers) {
-        super();
-
-        this.#users = mockedUsers;
+    constructor(mockedDatastore: any[]) {
+        this.#datastore = mockedDatastore;
     }
 
-    deleteRefreshToken(refreshToken) {
+    async deleteRefreshToken(refreshToken: RefreshToken): Promise<void> {
         console.log(`[Mock] Deleting refresh token for user: ${refreshToken.userId}`);
 
         // Nasty to mutate state but it's fine for test data
-        this.#users = this.#users.filter((a) => {
+        this.#datastore = this.#datastore.filter((a) => {
             return a.SK != refreshToken.toDO().SK;
         });
-
-        return true;
     }
 
-    addRefreshToken(refreshToken) {
+    async addRefreshToken(refreshToken: RefreshToken): Promise<void> {
         console.log(`[Mock] Adding refresh token for user: ${refreshToken.userId}`);
 
-        this.#users.push(refreshToken.toDO());
-
-        return true;
+        this.#datastore.push(refreshToken.toDO());
     }
 
-    addUser(user) {
+    async addUser(user: User): Promise<void> {
         console.log(`[Mock] Adding user: ${user.userAccount.userId}`);
 
-        this.#users.push(user.userAccount.toDO());
-        this.#users.push(user.federatedAccount.toDO());
+        this.#datastore.push(user.userAccount.toDO());
+        this.#datastore.push(user.federatedAccount.toDO());
     
         // Optional
         //
         if (user.refreshToken)
-            this.#users.push(user.refreshToken.toDO());
-
-        return true;
+            this.#datastore.push(user.refreshToken.toDO());
     } 
 
-    updateFederatedAccount(federatedAccount) {
+    async updateFederatedAccount(federatedAccount: FederatedAccount): Promise<void> { 
         console.log(`[Mock] Updating federated account for user: ${federatedAccount.userId}`);
     
-        let dataObject = federatedAccount.toDO();
-        this.#users.forEach((a) => {
+        const dataObject = federatedAccount.toDO();
+        this.#datastore.forEach((a) => {
             if (a.PK === dataObject.PK && a.SK.split('#')[0] == 'FA') {
                 a = dataObject;
                 return;
@@ -55,12 +52,12 @@ class MockedUserRepo extends UserRepo {
         });
     }
 
-    getUserForRefreshToken(refreshToken) {
+    async getUserForRefreshToken(refreshToken: string): Promise<User | undefined> {
         console.log(`[Mock] Checking for a user for refresh token: ${refreshToken}`);
 
         let user;
         const typedRefreshToken = "RT#" + refreshToken;
-        this.#users.forEach((a) => {
+        this.#datastore.forEach((a) => {
             if (a.SK === typedRefreshToken) {
                 user = this.getUserForId(a.PK.split('#')[1]);
                 return;
@@ -70,12 +67,15 @@ class MockedUserRepo extends UserRepo {
         return user;
     }
 
-    getUserForFederatedAccountId(federatedAccountId, federatedAccountType) {
+    async getUserForFederatedAccountId(
+        federatedAccountId: string, 
+        federatedAccountType: FederatedAccountType): Promise<User> {
+
         console.log(`[Mock] Checking for a user for federated account type ${federatedAccountType} and Id: ${federatedAccountId}`);
 
         const typedFederatedAccount = federatedAccountType + '#' + federatedAccountId;
         let user;
-        this.#users.forEach((a) => {
+        this.#datastore.forEach((a) => {
             if (a.SK === typedFederatedAccount) {
                 user = this.getUserForId(a.PK.split('#')[1]);
                 return;
@@ -85,36 +85,29 @@ class MockedUserRepo extends UserRepo {
         return user
     }
 
-    getUserForId(userId) {
+    async getUserForId(userId: string): Promise<User | undefined> {
         console.log(`[Mock] Retrieving user details: ${userId}`);
         
         const typedUserId = 'US#' + userId;
-        let accountDO = this.#users
+        const accountDO = this.#datastore
             .filter(a => a.PK === typedUserId && a.SK === typedUserId)[0];
 
-        let refreshTokenDO = this.#users
+        const refreshTokenDO = this.#datastore
             .filter((a) => {   
                 return a.PK === typedUserId && a.SK.split('#')[0] == 'RT';
             })[0];
 
-        let federatedAccountDO = this.#users
+        const federatedAccountDO = this.#datastore
             .filter((a) => {   
                 return a.PK === typedUserId && a.SK.split('#')[0] == 'FA';
             })[0];
 
-        let usr = new User();
-
-        usr.federatedAccount = new FederatedAccount();
-        usr.federatedAccount.fromDO(federatedAccountDO);
-
-        usr.refreshToken = new RefreshToken();
-        usr.refreshToken.fromDO(refreshTokenDO);
-
-        usr.userAccount = new UserAccount();
-        usr.userAccount.fromDO(accountDO);
-
-        return usr;
+        return new User(
+            "",
+            RefreshToken.fromDO(refreshTokenDO),
+            FederatedAccount.fromDO(federatedAccountDO),
+            UserAccount.fromDO(accountDO));
     }
-};
+}
 
 export {MockedUserRepo};
