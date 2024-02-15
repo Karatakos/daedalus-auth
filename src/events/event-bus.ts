@@ -1,14 +1,18 @@
+import { IEvent } from './event.js';
+
+type EventCallback = (event: IEvent) => void;
+
 class EventBus {
     constructor() {}
 
-    log = [];
-    callbacks = [];
+    log: IEvent[] = [];
+    callbacks: EventCallback[] = [];
 
-    subscribe(callback) {
+    subscribe(callback: EventCallback) {
         this.callbacks.push(callback);
     }
 
-    publish(event) {
+    publish(event: IEvent) {
         this.log.push(event)
         
         this.callbacks.forEach((callback) => {

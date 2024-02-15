@@ -8,7 +8,7 @@ class SecretsManager {
 
     constructor() {}
 
-    static createExpiry (ttl) {
+    static createExpiry (ttl): string {
         let date = new Date().getTime();
         date += (ttl * 60 * 60 * 1000);
     
