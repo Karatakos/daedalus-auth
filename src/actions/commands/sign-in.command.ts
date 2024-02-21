@@ -1,13 +1,24 @@
-import {ICommand, ICommandHandler} from './command.js';
-import {FederatedAccountType, FederatedAccount, RefreshToken, UserAccount, User, UserAccountStatus, UserAccountPolicy } from '../../entities/user.js';
-import {UserRepo} from '../../repository/user/user.repo.js';
-import {Jwt} from '../../util/jwt.js';
-import {v4 as uuid } from 'uuid';
+import { ICommand, ICommandHandler } from './command.js';
+import { 
+    FederatedAccountType, 
+    FederatedAccount, 
+    RefreshToken, 
+    UserAccount, 
+    User, 
+    UserAccountStatus } from '../../entities/user.js';
+import { UserRepo} from '../../repository/user/user.repo.js';
+import { v4 as uuid } from 'uuid';
 import { generateUsername } from 'friendly-username-generator';
-import {SecretsManager} from '../../util/secrets-manager.js';
-import {UserSignedInEvent} from '../../events/user-signed-in.event.js';
-import {UserSignInUnauthorizedEvent, UserSignInUnauthorizedReason} from '../../events/user-sign-in-unauthorized.event.js';
-import {EventBus} from '../../events/event-bus.js';
+import { UserSignedInEvent} from '../../events/user-signed-in.event.js';
+import { 
+    UserSignInUnauthorizedEvent, 
+    UserSignInUnauthorizedReason} from '../../events/user-sign-in-unauthorized.event.js';
+import { EventBus } from '../../events/event-bus.js';
+import { IJwksCache } from '../../util/jkws-paramstore-cache.js';
+import { Config } from '../../util/config.js';
+
+import jwt from 'jsonwebtoken';
+import jwkToPem from 'jwk-to-pem';
 
 class SigninCmd implements ICommand {
     constructor(
@@ -20,7 +31,8 @@ class SigninCmd implements ICommand {
 class SigninHandler implements ICommandHandler {
     constructor(
         public readonly repository: UserRepo, 
-        public readonly publisher: EventBus) {}
+        public readonly publisher: EventBus,
+        public readonly jwksCache: IJwksCache) {}
 
     async execute(cmd: SigninCmd): Promise<void> {
         // TODO: Validate the god damn Steam user token
@@ -46,8 +58,9 @@ class SigninHandler implements ICommandHandler {
                 }
 
                 if (user.refreshToken) {
-                    // Exsiting token needs invalidating
-                    await this.repository.deleteRefreshToken(user.refreshToken);
+                    // Existing token needs invalidating
+                    //
+                    this.repository.deleteRefreshToken(user.refreshToken);
                 }
 
                 // Update the Steam token if it has changed
@@ -66,7 +79,7 @@ class SigninHandler implements ICommandHandler {
                         updatedFederatedAccount,
                         user.userAccount);
 
-                    await this.repository.updateFederatedAccount(user.federatedAccount);
+                    this.repository.updateFederatedAccount(user.federatedAccount);
                 }
             }
             // We're going to create a user account for them
@@ -79,9 +92,6 @@ class SigninHandler implements ICommandHandler {
                     generateUsername({
                         useHyphen: false,
                         useRandomNumber: true }),
-                    new UserAccountPolicy(
-                        "guid1",            // TODO: Studio memberships
-                        ['admin']),
                     UserAccountStatus.ENABLED);
 
 
@@ -100,30 +110,37 @@ class SigninHandler implements ICommandHandler {
                 this.repository.addUser(user);
             }
 
+            const jwk = await this.jwksCache.getSigningKey();
+            const pem = jwkToPem(jwk, {private: true})
+            const signingOptions: jwt.SignOptions = {
+                algorithm: 'ES256',
+                keyid: jwk.kid };
+
             // Generate new refresh token
             //
-            const signedRefreshToken = Jwt.sign(
-                SecretsManager.refreshTokenSecret,
+            const signedRefreshToken = jwt.sign(
                 {
                     userId: user.userAccount.userId,
-                    exp: SecretsManager.createExpiry(SecretsManager.refreshTokenTTLHours)
-                });
-
+                    exp: Config.createExpiry(Config.refreshTokenTTLHours) },
+                pem,
+                signingOptions);
+                    
             const refreshToken = new RefreshToken(
                 user.userAccount.userId,
                 signedRefreshToken
             );
 
-            await this.repository.addRefreshToken(refreshToken);
+            this.repository.addRefreshToken(refreshToken);
 
             // Finally, generate new access token
             //
-            const accessToken = Jwt.sign(
-                SecretsManager.accessTokenSecret,
+            const accessToken = jwt.sign(
                 {
                     userId: user.userAccount.userId, 
-                    policy: user.userAccount.policy, 
-                    exp: SecretsManager.createExpiry(SecretsManager.accessTokenTTLHours)});
+                    policy: user.userAccount.policy,
+                    exp: Config.createExpiry(Config.accessTokenTTLHours) },
+                pem,
+                signingOptions);
 
             user = new User(
                 accessToken,

@@ -44,8 +44,8 @@ class UserAccount {
     constructor(
         public readonly userId: string,
         public readonly username: string,
-        public readonly policy: UserAccountPolicy,
-        public readonly status: UserAccountStatus
+        public readonly status: UserAccountStatus,
+        public readonly policy: UserAccountPolicy = new UserAccountPolicy()
     ) {
         this.createdOn = new Date();
     }
@@ -64,22 +64,20 @@ class UserAccount {
         return new UserAccount(
             userAccountDO.PK.split('#')[1],
             userAccountDO.username,
-            UserAccountPolicy.fromJSON(userAccountDO.policy),
-            userAccountDO.status as UserAccountStatus);
+            userAccountDO.status as UserAccountStatus,
+            UserAccountPolicy.fromJSON(userAccountDO.policy));
     }
 }
 
 class UserAccountPolicy {
     constructor (
-        public readonly studio: string,
-        public readonly capabilities: string[],  
+        public readonly capabilities: string[] = [],  
     ) {}
 
     static fromJSON(json: string): UserAccountPolicy {
         const tmp = JSON.parse(json);
 
         return new UserAccountPolicy(
-            tmp.studio,
             tmp.capabilities
         );
     }

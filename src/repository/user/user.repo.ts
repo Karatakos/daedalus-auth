@@ -1,6 +1,6 @@
 import {FederatedAccount, FederatedAccountType, RefreshToken, User} from '../../entities/user.js';
 
-interface UserRepo {
+interface IUserRepo {
     deleteRefreshToken(refreshToken: RefreshToken): void
     addRefreshToken(refreshToken: RefreshToken): void
     addUser(user: User): void 
@@ -11,4 +11,4 @@ interface UserRepo {
     getUserForId(userId: string): Promise<User | undefined>
 }
 
-export {UserRepo};
+export {IUserRepo as UserRepo};
