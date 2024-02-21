@@ -68,27 +68,6 @@ Once authenticated we authorize the user by vending a JWT.
     }
 ```
 
-### Validate Access Token
-
-Important: This is temporary. It's not scalable for services to have to hit this endpoint to validate a token. Instead, we will move to async encryption and expose and endpoint with public certs that can be cached.
-
-#### Use a refresh token to aquire a new access token 
-
-- Endpoint: **https://localhost/auth/validate**  
-- Method: POST 
-- Payload:
-```
-    {
-        accessToken: STRING
-    }
-``` 
-- Response:
-```
-    {
-        status: Valid | Invalid 
-    }
-```
-
 ### Refresh Access Token
 
 #### Use a refresh token to aquire a new access token 
@@ -101,3 +80,24 @@ Important: This is temporary. It's not scalable for services to have to hit this
         accessToken: STRING
     }
 ```
+
+### Validating an Access Token
+
+Tokens are signed with an asynchronous encryption scheme enabling a client with access to public keys to validate the access token. Simply fetch a list of public keys from http://<domain>/.well-known/jwks.json and select the key that matches your tokens header.kid. 
+
+### Key Store & Rotating Keys
+
+We use the following parameter store structure to enable a super simple rotation strategy:
+
+- /daedalus-auth-cert/private/jwk
+- /daedalus-auth-cert/public/jwk/<kid>
+
+There will only ever be one private key required for signing and we use the same key for both access and refresh tokens. 
+
+To rotate keys, simply:
+
+1. Update the existing private key (overwriting the old key) here /daedalus-auth-cert/private/jwk.
+1. Add the new public key under /daedalus-auth-cert/public/jwk/<kid>
+1. Redeploy by applying our kube deployment config for the auth service, or just restart. 
+
+Note: Ensure keys are JWK formatted.
