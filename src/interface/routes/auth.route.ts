@@ -2,14 +2,25 @@ import express, {Request, Response} from 'express';
 
 import { AccessTokenHandler, AccessTokenQuery } from '../../actions/queries/access-token.query.js';
 import { SigninHandler, SigninCmd } from '../../actions/commands/sign-in.command.js';
+
 import { EventBus } from '../../events/event-bus.js';
 import { UserSignedInEvent } from '../../events/user-signed-in.event.js';
 import { UserSignInUnauthorizedEvent } from '../../events/user-sign-in-unauthorized.event.js';
+
 import { UserRepoFactory } from '../../repository/user/user.repo.factory.js';
-import { parseCookies } from '../util/cookie-parser.js';
 import { FederatedAccountType } from '../../entities/user.js';
 
+import { parseCookies } from '../util/cookie-parser.js';
+
+import { JwksParameterStoreCache } from '../../util/jkws-paramstore-cache.js';
+
+import { SSMClient } from '@aws-sdk/client-ssm';
+
 const router = express.Router();
+
+const userRepo = UserRepoFactory.make()
+const eventBus = new EventBus();
+const jwksCache = new JwksParameterStoreCache(new SSMClient());
 
 router
     .route('/sign-in')
@@ -19,8 +30,7 @@ router
             if (!req.is('application/json') ||
                 !req.body?.oauthAccountId || 
                 !req.body?.oauthProvider ||
-                !req.body?.oauthToken ||
-                req.body?.oauthProvider != FederatedAccountType.STEAM) {
+                !req.body?.oauthToken) {
 
                 console.log(req.is('application/json'));
                 console.log(req.body);
@@ -30,7 +40,13 @@ router
                 return;
             }
 
-            const eventBus = new EventBus();
+            if (req.body?.oauthProvider != FederatedAccountType.STEAM) {
+                res.status(401).send({error: "Only Steam authentication supported."});
+
+                return;
+            }
+
+            
         
             // TODO: To fix this we need a solution to access a centralized
             // event bus instance like a queue that will allow the client to 
@@ -40,8 +56,9 @@ router
             // This is a very dirty work around in the meantime
             // 
             const signin = new SigninHandler(
-                UserRepoFactory.make(),
-                eventBus);
+                userRepo,
+                eventBus,
+                jwksCache);
 
             try {
                 // TODO: Do this asyncronously and expect the client to callback?
@@ -122,7 +139,8 @@ router
             }
 
             const refreshTokenHandler = new AccessTokenHandler(
-                UserRepoFactory.make());
+                userRepo,
+                jwksCache);
 
             const accessToken = await refreshTokenHandler.execute(
                 new AccessTokenQuery(refreshToken));
@@ -138,9 +156,7 @@ router
             });
         }
         catch (e) {
-            const error = e as Error;
-
-            res.status(401).send(error.message);
+            res.status(401).send(e);
         }
     });
 

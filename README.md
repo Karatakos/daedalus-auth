@@ -68,6 +68,27 @@ Once authenticated we authorize the user by vending a JWT.
     }
 ```
 
+### Validate Access Token
+
+Important: This is temporary. It's not scalable for services to have to hit this endpoint to validate a token. Instead, we will move to async encryption and expose and endpoint with public certs that can be cached.
+
+#### Use a refresh token to aquire a new access token 
+
+- Endpoint: **https://localhost/auth/validate**  
+- Method: POST 
+- Payload:
+```
+    {
+        accessToken: STRING
+    }
+``` 
+- Response:
+```
+    {
+        status: Valid | Invalid 
+    }
+```
+
 ### Refresh Access Token
 
 #### Use a refresh token to aquire a new access token 

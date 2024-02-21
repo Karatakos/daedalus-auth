@@ -3,10 +3,10 @@
         {
             "PutRequest": {
                 "Item": {
-                    "PK": {"S": "US#1a"},
-                    "SK": {"S": "US#1a"},
+                    "PK": {"S": "US#ee4ed797a4974e1299af4d76c67bd72e"},
+                    "SK": {"S": "US#ee4ed797a4974e1299af4d76c67bd72e"},
                     "username": {"S": "Adrian"},
-                    "policy": {"S": "{'studio': 'guid1', 'capabilities': ['admin']}"},
+                    "policy": {"S": "{'capabilities': ['admin']}"},
                     "status": {"S": "Enabled"}
                 }
             }
@@ -14,10 +14,10 @@
         {
             "PutRequest": {
                 "Item": {
-                    "PK": {"S": "US#2a"},
-                    "SK": {"S": "US#2a"},
+                    "PK": {"S": "US#9ed7afa5c0d44b80bb0b5a87532ac084"},
+                    "SK": {"S": "US#9ed7afa5c0d44b80bb0b5a87532ac084"},
                     "username": {"S": "Timmy"},
-                    "policy": {"S": "{'studio': 'guid1', 'capabilities': ['admin']}"},
+                    "policy": {"S": "{'capabilities': []}"},
                     "status": {"S": "Enabled"}
                 }
             }
@@ -25,10 +25,10 @@
         {
             "PutRequest": {
                 "Item": {
-                    "PK": {"S": "US#3a"},
-                    "SK": {"S": "US#3a"},
+                    "PK": {"S": "US#953fccf7a24345808b03e48683ee6a3b"},
+                    "SK": {"S": "US#953fccf7a24345808b03e48683ee6a3b"},
                     "username": {"S": "Sarah"},
-                    "policy": {"S": "{'studio': 'guid1', 'capabilities': ['admin']}"},
+                    "policy": {"S": "{'capabilities': []}"},
                     "status": {"S": "Disabled"}
                 }
             }
@@ -36,7 +36,7 @@
         {
             "PutRequest": {
                 "Item": {
-                    "PK": {"S": "US#1a"},
+                    "PK": {"S": "US#ee4ed797a4974e1299af4d76c67bd72e"},
                     "SK": {"S": "RT#eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJVUy0xIiwidXNlcm5hbWUiOiJBZHJpYW4iLCJwb2xpY3kiOnsic3R1ZGlvIjoiU1QtMSIsImNhcGFiaWxpdGllcyI6WyJhZG1pbiJdfSwic3RhdHVzIjoiRW5hYmxlZCIsImV4cCI6IjIwMjUtMDgtMDRUMTI6MDc6MzguNzUzWiJ9.-oKioH_5TFPZ7iQblAHj1jk9IPT09-mKJJHaAH02mcc"}
                 }
             }
@@ -44,7 +44,7 @@
         {
             "PutRequest": {
                 "Item": {
-                    "PK": {"S": "US#2a"},
+                    "PK": {"S": "US#9ed7afa5c0d44b80bb0b5a87532ac084"},
                     "SK": {"S": "RT#eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJVUy0yIiwidXNlcm5hbWUiOiJUaW1teSIsInBvbGljeSI6eyJzdHVkaW8iOiJTVC0xIiwiY2FwYWJpbGl0aWVzIjpbImFkbWluIl19LCJzdGF0dXMiOiJFbmFibGVkIiwiZXhwIjoiMjAyMS0wOC0wNFQxMjowNzozOC43NTNaIn0.VEvFkTw1RDlKEXmtAQFbVX3C2CCjjvnUgy6_qF69YaY"}
                 }
             }
@@ -52,7 +52,7 @@
         {
             "PutRequest": {
                 "Item": {
-                    "PK": {"S": "US#3a"},
+                    "PK": {"S": "US#953fccf7a24345808b03e48683ee6a3b"},
                     "SK": {"S": "RT#eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJVUy0yIiwidXNlcm5hbWUiOiJUaW1teSIsInBvbGljeSI6eyJzdHVkaW8iOiJTVC0xIiwiY2FwYWJpbGl0aWVzIjpbImFkbWluIl19LCJzdGF0dXMiOiJEaXNhYmxlZCIsImV4cCI6IjIwMjEtMDgtMDRUMTI6MDc6MzguNzUzWiJ9.B28FS6Jh4rujn68ZTIxTduBz1fzvnOsRNb0jMrjj9QY"}
                 }
             }
@@ -60,7 +60,7 @@
         {
             "PutRequest": {
                 "Item": {
-                    "PK": {"S": "US#1a"},
+                    "PK": {"S": "US#ee4ed797a4974e1299af4d76c67bd72e"},
                     "SK": {"S": "FA#ST#KaratakosJP#1983"},
                     "token": {"S": "12345"}
                 }
@@ -69,7 +69,7 @@
         {
             "PutRequest": {
                 "Item": {
-                    "PK": {"S": "US#2a"},
+                    "PK": {"S": "US#9ed7afa5c0d44b80bb0b5a87532ac084"},
                     "SK": {"S": "FA#ST#LittleTimmy#1987"},
                     "token": {"S": "12345"}
                 }
@@ -78,27 +78,9 @@
         {
             "PutRequest": {
                 "Item": {
-                    "PK": {"S": "US#3a"},
+                    "PK": {"S": "US#953fccf7a24345808b03e48683ee6a3b"},
                     "SK": {"S": "FA#ST#xDestinyStarzx#1986"},
                     "token": {"S": "12345"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "PK": {"S": "ST#1"},
-                    "SK": {"S": "ST#1"},
-                    "name": {"S": "Jellyfish Studios"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "PK": {"S": "ST#2"},
-                    "SK": {"S": "ST#2"},
-                    "name": {"S": "Studio X"}
                 }
             }
         }

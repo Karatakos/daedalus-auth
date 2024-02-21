@@ -94,6 +94,8 @@ class DynamoUserRepo implements UserRepo {
         let result;
     
         try {
+            // TODO: Handle timeout, e.g. no internet connection!
+            //
             result = await this.#dynamoAdapter.queryDataForParams(params);
             if (!result || result.length <= 0)
                 return undefined; 
